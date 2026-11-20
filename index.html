@@ -9,7 +9,7 @@
 <body>
   <header><div class="header-inner"><div><span class="eyebrow">SATELLITE EPHEMERIS</span><h1>卫星星历查询与导出</h1><p>检索 CelesTrak 在轨卫星，按指定时间和步长导出星历。</p></div><span class="source">数据源 CelesTrak GP/OMM</span></div></header>
   <main>
-    <section class="card"><h2>卫星检索</h2><p class="description">输入卫星名称、国际编号或 NORAD 编号。名称支持模糊查询。</p>
+    <section class="card"><h2>卫星检索</h2><p class="description">输入卫星名称、国际编号或 NORAD 编号，支持片段查询。编号查询首次加载在轨目录。</p>
       <form id="search-form" class="search"><input id="query" type="search" required maxlength="80" placeholder="例如 HJS、2025-067B、25544" aria-label="卫星名称或编号"><button id="search-button">查询</button></form>
       <div class="result-header"><span id="search-status" role="status">输入关键词开始查询。</span><button id="select-all" class="subtle" type="button" disabled>全选结果</button></div>
       <div id="results" class="results"></div>
