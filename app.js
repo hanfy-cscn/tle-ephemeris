@@ -46,7 +46,7 @@ $('search-form').onsubmit = async event => {
     if (/^\d+$/.test(query)) { key = 'CATNR'; value = query; }
     else if (/^\d{4}-\d{3}[A-Z]{0,3}$/.test(query)) { key = 'INTDES'; value = query.slice(0, 8); designation = query; }
     else { const hjs = query.match(/^HJS(?:[-\s]*(\d+[A-Z]*))?$/); if (hjs) value = 'HULIANWANG JISHU SHIYAN' + (hjs[1] ? ` ${hjs[1]}` : ''); }
-    const response = await fetch(`https://celestrak.org/NORAD/elements/gp.php?${new URLSearchParams({ [key]: value, FORMAT: 'JSON' })}`);
+    const response = await fetch(`https://celestrak.org/NORAD/elements/gp.php?${new URLSearchParams({ [key]: value, FORMAT: 'JSON' })}`, { signal: AbortSignal.timeout(20000) });
     if (response.status === 404) { results = []; $('search-status').textContent = '未找到匹配卫星。'; render(); return; }
     if (!response.ok) throw new Error(`CelesTrak 返回 HTTP ${response.status}`);
     const records = await response.json();
