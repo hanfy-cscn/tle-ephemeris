@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>卫星星历查询与导出</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header><div class="header-inner"><div><span class="eyebrow">SATELLITE EPHEMERIS</span><h1>卫星星历查询与导出</h1><p>检索 CelesTrak 在轨卫星，按指定时间和步长导出星历。</p></div><span class="source">数据源 CelesTrak GP/OMM</span></div></header>
+  <main>
+    <section class="card"><h2>卫星检索</h2><p class="description">输入卫星名称、国际编号或 NORAD 编号。名称支持模糊查询。</p>
+      <form id="search-form" class="search"><input id="query" type="search" required maxlength="80" placeholder="例如 HJS、2025-067B、25544" aria-label="卫星名称或编号"><button id="search-button">查询</button></form>
+      <div class="result-header"><span id="search-status" role="status">输入关键词开始查询。</span><button id="select-all" class="subtle" type="button" disabled>全选结果</button></div>
+      <div id="results" class="results"></div>
+    </section>
+    <section class="card"><div class="section-heading"><h2>已选卫星 <span id="count">0</span></h2><button id="clear" class="subtle" type="button">清空</button></div><p class="description">选择保存在当前浏览器，重新查询时更新匹配卫星的轨道根数。</p><div id="selected" class="selected"><p class="empty">尚未选择卫星</p></div></section>
+    <section class="card"><h2>外推与导出</h2><p class="description">时间统一为北京时间，位置单位为 km，速度单位为 km/s。</p>
+      <form id="export-form"><div class="fields"><label>开始时间（北京时间）<input id="start" type="datetime-local" step="1" required></label><label>结束时间（北京时间）<input id="end" type="datetime-local" step="1" required></label><label>采样步长（秒）<input id="step" type="number" min="1" step="1" value="30" required></label></div>
+        <div class="shortcuts"><span>结束时间</span><button type="button" data-days="1">+1 天</button><button type="button" data-days="3">+3 天</button><button type="button" data-days="5">+5 天</button><button type="button" data-days="7">+7 天</button></div>
+        <div class="export-actions"><button id="export" type="submit">计算并导出 CSV</button><button id="cancel" class="subtle" type="button" hidden>取消</button><span id="export-status" role="status">请先选择卫星。</span></div><progress id="progress" max="100" value="0" hidden></progress>
+      </form>
+    </section>
+    <p class="footnote">轨道由 SGP4 根据所选根数外推。请结合轨道根数历元和外推时间判断结果的适用性。</p>
+  </main><script type="module" src="./app.js"></script>
+</body>
+</html>
