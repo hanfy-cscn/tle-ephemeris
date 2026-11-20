@@ -1,3 +1,5 @@
+import { initGlobe } from './globe.js';
+
 const $ = id => document.getElementById(id);
 const storageKey = 'tle-ephemeris-selection-v1';
 const selected = new Map();
@@ -175,3 +177,11 @@ $('export-form').onsubmit = async event => {
   } catch (error) { if (error.name !== 'AbortError') $('export-status').textContent = `导出失败：${error.message}`; }
 };
 render();
+initGlobe({
+  getSatellites: () => [...selected.values()],
+  getTimes: () => {
+    const parse = value => Date.parse(`${value.length === 16 ? value + ':00' : value}+08:00`);
+    const start = parse($('start').value), end = parse($('end').value);
+    return { start, duration:(end - start) / 1000, step:Number($('step').value) };
+  },
+});

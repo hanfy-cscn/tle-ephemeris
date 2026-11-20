@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>卫星星历查询与导出</title>
+  <link rel="stylesheet" href="./vendor/cesium/Widgets/widgets.css">
   <link rel="stylesheet" href="./style.css">
 </head>
 <body>
@@ -21,7 +22,15 @@
         <div class="export-actions"><button id="export" type="submit">计算并导出 CSV</button><button id="cancel" class="subtle" type="button" hidden>取消</button><span id="export-status" role="status">请先选择卫星。</span></div><progress id="progress" max="100" value="0" hidden></progress>
       </form>
     </section>
+    <section class="card visualization"><h2>三维星座可视化</h2><p class="description">根据已选卫星及外推时间显示位置，点击卫星查看可视范围。</p>
+      <div class="viewer-settings"><label>离轴半角（°）<input id="off-nadir" type="number" min="0.1" max="89" step="0.1" value="51"></label><button id="show-globe" type="button">显示卫星</button><label class="check"><input id="show-coverage" type="checkbox" checked>显示选中卫星的可视范围</label><label class="check"><input id="show-trajectory" type="checkbox">显示选中卫星轨迹</label></div>
+      <div class="terminal-header"><h3>地面终端</h3><button id="add-terminal" class="subtle" type="button">添加终端</button></div>
+      <p class="description">填写经纬度和椭球高，连线表示当前时刻可视范围内距离最近的卫星。</p>
+      <div id="terminals"></div><div id="terminal-assignments" role="status"></div>
+      <div id="globe" aria-label="卫星三维地球"></div>
+      <div class="visual-playback"><button id="visual-play" type="button" disabled>播放</button><label>倍速 <select id="visual-speed"><option value="1">1×</option><option value="30" selected>30×</option><option value="300">300×</option></select></label><span id="visual-time">尚未显示卫星</span><input id="visual-progress" type="range" min="0" max="1" step="1" value="0" disabled aria-label="定位可视化时刻"></div><p id="visual-status" role="status"></p>
+    </section>
     <p class="footnote">轨道由 SGP4 根据所选根数外推。请结合轨道根数历元和外推时间判断结果的适用性。</p>
-  </main><script type="module" src="./app.js"></script>
+  </main><script>window.CESIUM_BASE_URL = './vendor/cesium/';</script><script src="./vendor/cesium/Cesium.js"></script><script type="module" src="./app.js"></script>
 </body>
 </html>
