@@ -10,9 +10,9 @@
 <body>
   <header><div class="header-inner"><div><span class="eyebrow">SATELLITE EPHEMERIS</span><h1>卫星星历查询与导出</h1><p>检索 CelesTrak 在轨卫星，按指定时间和步长导出星历。</p></div><span class="source">数据源 CelesTrak GP/OMM</span></div></header>
   <main>
-    <section class="card"><h2>卫星检索</h2><p class="description">输入卫星名称、国际编号或 NORAD 编号，支持片段查询。编号查询首次加载在轨目录。</p>
+    <section class="card"><h2>卫星检索</h2><p class="description">输入卫星名称、国际编号或 NORAD 编号。数字先精确查询，可继续查询编号片段。</p>
       <form id="search-form" class="search"><input id="query" type="search" required maxlength="80" placeholder="例如 HJS、2025-067B、25544" aria-label="卫星名称或编号"><button id="search-button">查询</button></form>
-      <div class="result-header"><span id="search-status" role="status">输入关键词开始查询。</span><button id="select-all" class="subtle" type="button" disabled>全选结果</button></div>
+      <div class="result-header"><span id="search-status" role="status">输入关键词开始查询。</span><div class="result-actions"><button id="search-more" class="subtle" type="button" hidden>查询更多匹配</button><button id="select-all" class="subtle" type="button" disabled>全选结果</button></div></div>
       <div id="results" class="results"></div>
     </section>
     <section class="card"><div class="section-heading"><h2>已选卫星 <span id="count">0</span></h2><button id="clear" class="subtle" type="button">清空</button></div><p class="description">选择保存在当前浏览器，重新查询时更新匹配卫星的轨道根数。</p><div id="selected" class="selected"><p class="empty">尚未选择卫星</p></div></section>

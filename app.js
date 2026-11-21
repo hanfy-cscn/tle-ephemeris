@@ -3,7 +3,7 @@ import { initGlobe } from './globe.js';
 const $ = id => document.getElementById(id);
 const storageKey = 'tle-ephemeris-selection-v1';
 const selected = new Map();
-let results = [], catalog, selectionBusy = false, worker, writer, cancelled = false;
+let results = [], catalog, moreQuery = '', selectionBusy = false, worker, writer, cancelled = false;
 
 try {
   for (const satellite of JSON.parse(localStorage.getItem(storageKey) || '[]')) selected.set(satellite.id, satellite);
@@ -94,9 +94,12 @@ $('search-form').onsubmit = async event => {
   event.preventDefault();
   const query = $('query').value.trim().toUpperCase();
   if (!query) return;
+  moreQuery = /^\d+$/.test(query) ? query : '';
+  $('search-more').hidden = !moreQuery;
+  $('search-more').disabled = true;
   $('search-button').disabled = true; $('search-status').textContent = '正在查询 CelesTrak…';
   try {
-    if (/^\d+$/.test(query) || /^\d{4}-[0-9A-Z]*$/.test(query)) {
+    if (/^\d{4}-[0-9A-Z]*$/.test(query) && !/^\d{4}-\d{3}[A-Z]{0,3}$/.test(query)) {
       $('search-status').textContent = catalog ? '正在匹配在轨目录…' : '正在读取在轨目录，首次查询可能需要一些时间…';
       const matches = (await loadCatalog()).filter(item => String(item.id).includes(query) || item.designator.toUpperCase().includes(query));
       results = matches.slice(0, 50);
@@ -114,11 +117,24 @@ $('search-form').onsubmit = async event => {
     const records = await response.json();
     if (!Array.isArray(records)) throw new Error('CelesTrak 返回的数据格式有误');
     const fetched = new Date().toISOString();
-    results = records.filter(record => record.NORAD_CAT_ID && record.OBJECT_NAME && (key !== 'NAME' || record.OBJECT_NAME.toUpperCase().includes(value)) && (!designation || designation.length === 8 || record.OBJECT_ID?.toUpperCase() === designation)).slice(0, 50).map(record => ({ id: Number(record.NORAD_CAT_ID), name: record.OBJECT_NAME, designator: record.OBJECT_ID || '', epoch: record.EPOCH || '', fetched, elements: record }));
+    results = records.filter(record => record.NORAD_CAT_ID && record.OBJECT_NAME && (key !== 'CATNR' || String(record.NORAD_CAT_ID) === String(Number(value))) && (key !== 'NAME' || record.OBJECT_NAME.toUpperCase().includes(value)) && (!designation || designation.length === 8 || record.OBJECT_ID?.toUpperCase() === designation)).slice(0, 50).map(record => ({ id: Number(record.NORAD_CAT_ID), name: record.OBJECT_NAME, designator: record.OBJECT_ID || '', epoch: record.EPOCH || '', fetched, elements: record }));
     for (const satellite of results) if (selected.has(satellite.id)) selected.set(satellite.id, satellite);
     saveSelection(); render(); $('search-status').textContent = results.length ? `找到 ${results.length} 颗匹配卫星${records.length > 50 ? '，最多显示 50 颗' : ''}。` : '未找到匹配卫星。';
   } catch (error) { $('search-status').textContent = `查询失败：${error.message}，请检查网络后重试。`; }
-  finally { $('search-button').disabled = false; }
+  finally { $('search-button').disabled = false; $('search-more').disabled = false; }
+};
+$('query').addEventListener('input', () => { if ($('query').value.trim().toUpperCase() !== moreQuery) $('search-more').hidden = true; });
+$('search-more').onclick = async () => {
+  if (!moreQuery || $('query').value.trim().toUpperCase() !== moreQuery) return;
+  $('search-button').disabled = true; $('search-more').disabled = true;
+  $('search-status').textContent = catalog ? '正在匹配在轨目录…' : '正在读取在轨目录，首次查询可能需要一些时间…';
+  try {
+    const matches = (await loadCatalog()).filter(item => String(item.id).includes(moreQuery));
+    results = matches.slice(0, 50);
+    render();
+    $('search-status').textContent = matches.length ? `找到 ${matches.length} 个在轨对象${matches.length > 50 ? '，显示前 50 个' : ''}，选中时获取轨道根数。` : '未找到匹配的在轨对象。';
+  } catch (error) { $('search-status').textContent = `查询失败：${error.message}，请检查网络后重试。`; }
+  finally { $('search-button').disabled = false; $('search-more').disabled = false; }
 };
 $('select-all').onclick = async () => {
   selectionBusy = true; render();
